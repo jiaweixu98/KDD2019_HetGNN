@@ -6,11 +6,11 @@ def read_args():
 				   help='path to data')
 	parser.add_argument('--model_path', type = str, default = '../model_save/',
 				   help='path to save model')
-	parser.add_argument('--A_n', type = int, default = 753072,
+	parser.add_argument('--A_n', type = int, default = 666080,
 				   help = 'number of author node')
-	parser.add_argument('--P_n', type = int, default = 412500,
+	parser.add_argument('--P_n', type = int, default = 300708,
 				   help = 'number of paper node')
-	parser.add_argument('--V_n', type = int, default = 545982,
+	parser.add_argument('--V_n', type = int, default = 506320,
 				   help = 'number of venue node')
 	parser.add_argument('--in_f_d', type = int, default = 128,
 				   help = 'input feature dimension')

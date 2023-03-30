@@ -1,3 +1,4 @@
+# nohup python -u HetGNN.py > HetGNN_new_notqdm.log 2>&1 &
 import torch
 import torch.optim as optim
 import data_generator
@@ -71,7 +72,7 @@ class model_class(object):
 		mini_batch_s = self.args.mini_batch_s
 		embed_d = self.args.embed_d
 
-		for iter_i in tqdm(range(self.args.train_iter_n)):
+		for iter_i in range(self.args.train_iter_n):
 			print ('iteration ' + str(iter_i) + ' ...')
 			triple_list = self.input_data.sample_het_walk_triple()
 			min_len = 1e10
@@ -104,7 +105,7 @@ class model_class(object):
 					print ("loss: " + str(loss))
 
 			if iter_i % self.args.save_model_freq == 0:
-				torch.save(self.model.state_dict(), self.args.model_path + "HetGNN_" + str(iter_i) + ".pt")
+				torch.save(self.model.state_dict(), self.args.model_path + "HetGNN_rename_notqdm" + str(iter_i) + ".pt")
 				# save embeddings for evaluation
 				triple_index = 9 
 				a_out, p_out, v_out = self.model([], triple_index,iter_i)

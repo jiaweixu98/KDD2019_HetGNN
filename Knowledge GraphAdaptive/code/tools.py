@@ -76,15 +76,14 @@ class HetAgg(nn.Module):
 		# embed_d = in_f_d, it is flexible to add feature transformer (e.g., FC) here 
 		#print (id_batch)
 		a_net_embed_batch = self.feature_list[6][id_batch]
+		a_text_embed_batch_1 = self.feature_list[7][id_batch, :embed_d][0]
+		a_text_embed_batch_2 = self.feature_list[7][id_batch, embed_d : embed_d * 2][0]
+		a_text_embed_batch_3 = self.feature_list[7][id_batch, embed_d * 2 : embed_d * 3][0]
 
-		# a_text_embed_batch_1 = self.feature_list[7][id_batch, :embed_d][0]
-		# a_text_embed_batch_2 = self.feature_list[7][id_batch, embed_d : embed_d * 2][0]
-		# a_text_embed_batch_3 = self.feature_list[7][id_batch, embed_d * 2 : embed_d * 3][0]
-
-		# concate_embed = torch.cat((a_net_embed_batch, a_text_embed_batch_1, a_text_embed_batch_2,\
-		#  a_text_embed_batch_3), 1).view(len(id_batch[0]), 4, embed_d)
+		concate_embed = torch.cat((a_net_embed_batch, a_text_embed_batch_1, a_text_embed_batch_2,\
+		 a_text_embed_batch_3), 1).view(len(id_batch[0]), 4, embed_d)
 		#  这里没必要拼了，因为3个文本的先不用,2000*1*128维度
-		concate_embed = a_net_embed_batch.view(len(id_batch[0]), 1, embed_d)
+		# concate_embed = a_net_embed_batch.view(len(id_batch[0]), 1, embed_d)
 		# 这里用了转置函数，把input（即上面的concate_embed）交换了维度0和维度1
 		concate_embed = torch.transpose(concate_embed, 0, 1)
 		all_state, last_state = self.a_content_rnn(concate_embed)
@@ -93,16 +92,16 @@ class HetAgg(nn.Module):
 # 同上
 	def p_content_agg(self, id_batch):
 		embed_d = self.embed_d
-		# p_a_embed_batch = self.feature_list[0][id_batch]
+		p_a_embed_batch = self.feature_list[0][id_batch]
 		# p_t_embed_batch = self.feature_list[1][id_batch]
 		p_v_net_embed_batch = self.feature_list[2][id_batch]
 		p_a_net_embed_batch = self.feature_list[3][id_batch]
 		p_net_embed_batch = self.feature_list[5][id_batch]
 
-		# concate_embed = torch.cat((p_a_embed_batch, p_t_embed_batch, p_v_net_embed_batch,\
-		#  p_a_net_embed_batch, p_net_embed_batch), 1).view(len(id_batch[0]), 5, embed_d)
-		concate_embed = torch.cat((p_v_net_embed_batch,\
-		 p_a_net_embed_batch, p_net_embed_batch), 1).view(len(id_batch[0]), 3, embed_d)
+		concate_embed = torch.cat((p_a_embed_batch, p_v_net_embed_batch,\
+		 p_a_net_embed_batch, p_net_embed_batch), 1).view(len(id_batch[0]), 4, embed_d)
+		# concate_embed = torch.cat((p_v_net_embed_batch,\
+		#  p_a_net_embed_batch, p_net_embed_batch), 1).view(len(id_batch[0]), 3, embed_d)
 		concate_embed = torch.transpose(concate_embed, 0, 1)
 		all_state, last_state = self.p_content_rnn(concate_embed)
 		return torch.mean(all_state, 0)
@@ -111,15 +110,15 @@ class HetAgg(nn.Module):
 	def v_content_agg(self, id_batch):
 		embed_d = self.embed_d
 		v_net_embed_batch = self.feature_list[8][id_batch]
-		# v_text_embed_batch_1 = self.feature_list[9][id_batch, :embed_d][0]
-		# v_text_embed_batch_2 = self.feature_list[9][id_batch, embed_d: 2 * embed_d][0]
-		# v_text_embed_batch_3 = self.feature_list[9][id_batch, 2 * embed_d: 3 * embed_d][0]
-		# v_text_embed_batch_4 = self.feature_list[9][id_batch, 3 * embed_d: 4 * embed_d][0]
-		# v_text_embed_batch_5 = self.feature_list[9][id_batch, 4 * embed_d:][0]
+		v_text_embed_batch_1 = self.feature_list[9][id_batch, :embed_d][0]
+		v_text_embed_batch_2 = self.feature_list[9][id_batch, embed_d: 2 * embed_d][0]
+		v_text_embed_batch_3 = self.feature_list[9][id_batch, 2 * embed_d: 3 * embed_d][0]
+		v_text_embed_batch_4 = self.feature_list[9][id_batch, 3 * embed_d: 4 * embed_d][0]
+		v_text_embed_batch_5 = self.feature_list[9][id_batch, 4 * embed_d:][0]
 
-		# concate_embed = torch.cat((v_net_embed_batch, v_text_embed_batch_1, v_text_embed_batch_2, v_text_embed_batch_3,\
-		# 	v_text_embed_batch_4, v_text_embed_batch_5), 1).view(len(id_batch[0]), 6, embed_d)
-		concate_embed = v_net_embed_batch.view(len(id_batch[0]), 1, embed_d)
+		concate_embed = torch.cat((v_net_embed_batch, v_text_embed_batch_1, v_text_embed_batch_2, v_text_embed_batch_3,\
+			v_text_embed_batch_4, v_text_embed_batch_5), 1).view(len(id_batch[0]), 6, embed_d)
+		# concate_embed = v_net_embed_batch.view(len(id_batch[0]), 1, embed_d)
 		concate_embed = torch.transpose(concate_embed, 0, 1)
 		all_state, last_state = self.v_content_rnn(concate_embed)
 		
@@ -254,7 +253,7 @@ class HetAgg(nn.Module):
 			p_agg = self.node_het_agg(pos_id_batch, 3)
 			n_agg = self.node_het_agg(neg_id_batch, 3)
 		elif triple_index == 9: #save learned node embedding
-			embed_file = open(self.args.data_path + str(iter_i)+"_node_embedding.txt", "w")
+			embed_file = open(self.args.data_path + str(iter_i)+"_node_embedding_re_notqdm.txt", "w")
 			save_batch_s = self.args.mini_batch_s
 			for i in range(3):
 				if i == 0:

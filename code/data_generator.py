@@ -140,20 +140,28 @@ class input_data(object):
 					p_ref_net_embed[i] = p_net_embed[i]
 
 			#empirically use 3 paper embedding for author content embeding generation
+			# 我们这里直接改成 768维度！他这里能改成n* 384维度
 			a_text_embed = np.zeros((self.args.A_n, self.args.in_f_d * 3))
 			for i in range(self.args.A_n):
 				if len(a_p_list_train[i]):
 					feature_temp = []
 					if len(a_p_list_train[i]) >= 3:
 						#id_list_temp = random.sample(a_p_list_train[i], 5)
+						# 超过3，导进来3个
 						for j in range(3):
+							# 导进来一个128维度的
 							feature_temp.append(p_abstract_embed[int(a_p_list_train[i][j][1:])])
 					else:
+						# 不足3，导进来相同的东西
 						for j in range(len(a_p_list_train[i])):
+							# 导进来一个128维度的
 							feature_temp.append(p_abstract_embed[int(a_p_list_train[i][j][1:])])
 						for k in range(len(a_p_list_train[i]), 3):
+							# 导进来一个128维度的
 							feature_temp.append(p_abstract_embed[int(a_p_list_train[i][-1][1:])])
-
+#feature_temp 是个 3*128维度的
+# 这里变成：[[3*128个数]]
+# a_text_embed：A_n 个 [[3*128个数]]
 					feature_temp = np.reshape(np.asarray(feature_temp), [1, -1])
 					a_text_embed[i] = feature_temp
 
@@ -173,6 +181,7 @@ class input_data(object):
 							feature_temp.append(p_abstract_embed[int(v_p_list_train[i][-1][1:])])
 
 					feature_temp = np.reshape(np.asarray(feature_temp), [1, -1])
+					
 					v_text_embed[i] = feature_temp
 
 			self.p_v = p_v

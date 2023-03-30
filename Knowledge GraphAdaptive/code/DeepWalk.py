@@ -1,3 +1,4 @@
+# nohup python DeepWalk.py > DeepWalk.log 2>&1 &
 import string;
 import re;
 import random
@@ -5,7 +6,6 @@ import math
 import numpy as np
 from gensim.models import Word2Vec
 from itertools import *
-from tqdm import tqdm
 dimen = 128
 window = 5
 import logging
@@ -17,7 +17,7 @@ def read_random_walk_corpus():
 	walks=[]
 	#inputfile = open("../data/academic_test/meta_random_walk_APVPA_test.txt","r")
 	inputfile = open("../data/academic/het_random_walk_test.txt", "r")
-	for line in tqdm(inputfile):
+	for line in inputfile:
 		path = []
 		node_list=re.split(' ',line)
 		for i in range(len(node_list)):

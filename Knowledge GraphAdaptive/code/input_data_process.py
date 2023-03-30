@@ -1,3 +1,4 @@
+# nohup python input_data_process.py > input_data_process.log 2>&1 &
 import six.moves.cPickle as pickle
 import numpy as np
 import argparse
@@ -9,13 +10,12 @@ from collections import Counter
 from itertools import *
 from tqdm import tqdm
 
-
 parser = argparse.ArgumentParser(description = 'input data process')
-parser.add_argument('--A_n', type = int, default = 753072,
+parser.add_argument('--A_n', type = int, default = 666080,
 			   help = 'number of author node')
-parser.add_argument('--P_n', type = int, default = 412500,
+parser.add_argument('--P_n', type = int, default = 300708,
 			   help = 'number of paper node')
-parser.add_argument('--V_n', type = int, default = 545982,
+parser.add_argument('--V_n', type = int, default = 506320,
 			   help = 'number of venue node')
 parser.add_argument('--C_n', type = int, default = 4,
 			   help = 'number of node class label')
@@ -40,7 +40,7 @@ class input_data(object):
 # 这里，把对应的参数改为我们的数据
 		a_p_list_train = [[] for k in range(self.args.A_n)]
 		p_a_list_train = [[] for k in range(self.args.P_n)]
-		# p_p_cite_list_train = [[] for k in range(self.args.P_n)]
+		p_p_cite_list_train = [[] for k in range(self.args.P_n)]
 		v_p_list_train = [[] for k in range(self.args.V_n)]
 		# 我们的pv也是一对多
 		p_v = [[] for k in range(self.args.P_n)]
@@ -48,7 +48,7 @@ class input_data(object):
 		# relation_f = ["a_p_list_train.txt", "p_a_list_train.txt",\
 		#  "p_p_citation_list.txt", "v_p_list_train.txt"]
 		# 暂时没有pp
-		relation_f = ["a_p_list_train.txt", "p_a_list_train.txt", "v_p_list_train.txt",'p_v.txt']
+		relation_f = ["a_p_list_train.txt", "p_a_list_train.txt", "v_p_list_train.txt",'p_v.txt', "p_p_citation_list.txt"]
 		#store academic relational data 
 		for i in range(len(relation_f)):
 			f_name = relation_f[i]
@@ -67,11 +67,10 @@ class input_data(object):
 						a_p_list_train[node_id].append('p'+str(neigh_list_id[j]))
 				elif f_name == 'p_a_list_train.txt':
 					for j in range(len(neigh_list_id)):
-						p_a_list_train[node_id].append('a'+str(neigh_list_id[j]))
-						
-				# elif f_name == 'p_p_citation_list.txt':
-				# 	for j in range(len(neigh_list_id)):
-				# 		p_p_cite_list_train[node_id].append('p'+str(neigh_list_id[j]))
+						p_a_list_train[node_id].append('a'+str(neigh_list_id[j]))					
+				elif f_name == 'p_p_citation_list.txt':
+					for j in range(len(neigh_list_id)):
+						p_p_cite_list_train[node_id].append('p'+str(neigh_list_id[j]))
 				elif f_name == 'p_v.txt':
 					for j in range(len(neigh_list_id)):
 						p_v[node_id].append('v'+str(neigh_list_id[j]))
@@ -96,14 +95,14 @@ class input_data(object):
 		p_neigh_list_train = [[] for k in range(self.args.P_n)]
 		for i in range(self.args.P_n):
 			p_neigh_list_train[i] += p_a_list_train[i]
-			# p_neigh_list_train[i] += p_p_cite_list_train[i] 
+			p_neigh_list_train[i] += p_p_cite_list_train[i] 
 			p_neigh_list_train[i] += p_v[i]
 			# p_neigh_list_train[i].append('v' + str(p_v[i]))
 		#print p_neigh_list_train[11846]
 
 		self.a_p_list_train =  a_p_list_train
 		self.p_a_list_train = p_a_list_train
-		# self.p_p_cite_list_train = p_p_cite_list_train
+		self.p_p_cite_list_train = p_p_cite_list_train
 		self.p_neigh_list_train = p_neigh_list_train
 		self.v_p_list_train = v_p_list_train
 		self.p_v = p_v
